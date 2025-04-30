@@ -1,0 +1,302 @@
+<!-- templates/results.html -->
+{% extends 'base.html' %}
+
+{% block title %}Benchmarking Results | Level99{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12">
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">Competitor Benchmarking Results</h2>
+                <a href="{{ url_for('index') }}" class="btn btn-outline-light">
+                    <i class="bi bi-search"></i> New Search
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="search-parameters mb-4">
+                    <h4>Search Parameters</h4>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <p><strong>Location:</strong> {{ search_params.city_state }}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <p><strong>ZIP Code:</strong> {{ search_params.zip_code }}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <p><strong>Search Radius:</strong> {{ search_params.search_radius }} miles</p>
+                        </div>
+                        <div class="col-md-3">
+                            <p><strong>Results Per Category:</strong> {{ search_params.results_per_category }}</p>
+                        </div>
+                    </div>
+                    <p><strong>Categories:</strong> {{ search_params.selected_categories|join(', ') }}</p>
+                </div>
+                
+                {% if error %}
+                <div class="alert alert-danger">
+                    <h4 class="alert-heading">Error</h4>
+                    <p>{{ error }}</p>
+                </div>
+                {% elif results %}
+                
+                {% if results.raw_text %}
+                <!-- Display raw text if JSON parsing failed -->
+                <div class="alert alert-warning mb-4">
+                    <h4 class="alert-heading">Structured Data Parsing Failed</h4>
+                    <p>The results could not be parsed into structured data. Raw response is shown below:</p>
+                </div>
+                <pre class="bg-light p-3 mb-4">{{ results.raw_text }}</pre>
+                {% else %}
+                
+                <!-- Form for selecting businesses for pricing research -->
+                <form action="{{ url_for('select_competitors') }}" method="post" id="competitorsForm">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="mb-0">Found Competitors</h4>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-cash-coin me-1"></i> Get Detailed Pricing for Selected Businesses
+                        </button>
+                    </div>
+                
+                    <!-- Grouped by category -->
+                    <div class="category-filters mb-4">
+                        <h5>Filter by Category</h5>
+                        <div class="btn-group flex-wrap" role="group">
+                            <button type="button" class="btn btn-outline-primary category-filter active" data-category="all">All</button>
+                            {% set categories = [] %}
+                            {% for competitor in results %}
+                                {% if competitor.category not in categories %}
+                                    {% set _ = categories.append(competitor.category) %}
+                                    <button type="button" class="btn btn-outline-primary category-filter" data-category="{{ competitor.category }}">{{ competitor.category }}</button>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="competitors-table">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th scope="col" width="40">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="select-all">
+                                            <label class="form-check-label" for="select-all"></label>
+                                        </div>
+                                    </th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Category</th>
+                                    <th scope="col">Distance</th>
+                                    <th scope="col">Description</th>
+                                    <th scope="col">Notable Features</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for competitor in results %}
+                                <tr class="competitor-row" data-category="{{ competitor.category }}">
+                                    <td>
+                                        <div class="form-check">
+                                            <input class="form-check-input select-business" type="checkbox" name="selected_businesses" value="{{ loop.index0 }}" id="select-{{ loop.index }}">
+                                            <label class="form-check-label" for="select-{{ loop.index }}"></label>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <strong>{{ competitor.name }}</strong>
+                                        <div class="small text-muted">{{ competitor.address }}</div>
+                                    </td>
+                                    <td>{{ competitor.category }}</td>
+                                    <td>{{ competitor.distance }}</td>
+                                    <td>{{ competitor.description }}</td>
+                                    <td>
+                                        {% if competitor.notable_features %}
+                                        <ul class="mb-0 ps-3">
+                                            {% for feature in competitor.notable_features %}
+                                            <li>{{ feature }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Custom competitor container (hidden inputs) -->
+                    <div id="custom-competitors-container"></div>
+                    
+                    <!-- Add Competitor Form (Simplified) -->
+                    <div class="add-competitor-form mt-4">
+                        <h5><i class="bi bi-plus-circle"></i> Add Missing Competitor</h5>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="new-competitor-name" class="form-label">Business Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="new-competitor-name" placeholder="Business name">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="new-competitor-category" class="form-label">Category <span class="text-danger">*</span></label>
+                                <select class="form-select" id="new-competitor-category">
+                                    {% for category in categories %}
+                                    <option value="{{ category }}">{{ category }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="new-competitor-address" class="form-label">Address <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="new-competitor-address" placeholder="Business address">
+                            </div>
+                            <div class="col-12">
+                                <button type="button" class="btn btn-success" id="add-competitor-btn">
+                                    <i class="bi bi-plus-lg"></i> Add to List
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                {% endif %}
+                {% else %}
+                <div class="alert alert-info">
+                    <h4 class="alert-heading">No Results</h4>
+                    <p>No competitor data was returned for your search criteria.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Category filtering
+    const categoryButtons = document.querySelectorAll('.category-filter');
+    const competitorRows = document.querySelectorAll('.competitor-row');
+    
+    categoryButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const category = this.getAttribute('data-category');
+            
+            // Toggle active class
+            categoryButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Show/hide rows based on category
+            competitorRows.forEach(row => {
+                if (category === 'all' || row.getAttribute('data-category') === category) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    });
+    
+    // Select all functionality
+    const selectAllCheckbox = document.getElementById('select-all');
+    const businessCheckboxes = document.querySelectorAll('.select-business');
+    
+    if(selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', function() {
+            const isChecked = this.checked;
+            
+            businessCheckboxes.forEach(checkbox => {
+                // Only check/uncheck visible rows (respecting category filtering)
+                const row = checkbox.closest('tr');
+                if(row.style.display !== 'none') {
+                    checkbox.checked = isChecked;
+                }
+            });
+        });
+    }
+    
+    // Track custom competitors
+    let customCompetitorCount = 0;
+    const customCompetitorsContainer = document.getElementById('custom-competitors-container');
+    const competitorsForm = document.getElementById('competitorsForm');
+    
+    // Add competitor functionality (simplified)
+    const addCompetitorBtn = document.getElementById('add-competitor-btn');
+    if (addCompetitorBtn) {
+        addCompetitorBtn.addEventListener('click', function() {
+            const name = document.getElementById('new-competitor-name').value.trim();
+            const category = document.getElementById('new-competitor-category').value;
+            const address = document.getElementById('new-competitor-address').value.trim();
+            
+            if (!name || !category || !address) {
+                alert('Please fill out all required fields to add a competitor');
+                return;
+            }
+            
+            // Get the table and its tbody
+            const table = document.getElementById('competitors-table');
+            const tbody = table.querySelector('tbody');
+            
+            // Create a new row
+            const newRow = document.createElement('tr');
+            newRow.className = 'competitor-row fade-in';
+            newRow.setAttribute('data-category', category);
+            
+            // Create unique ID for this custom competitor
+            const customCompId = `custom-${customCompetitorCount}`;
+            
+            // Create the competitorData object
+            const competitorData = {
+                name: name,
+                category: category,
+                address: address
+            };
+            
+            // Create hidden input for the custom competitor data
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = `custom_competitor_${customCompetitorCount}`;
+            hiddenInput.value = JSON.stringify(competitorData);
+            customCompetitorsContainer.appendChild(hiddenInput);
+            
+            // Create the row HTML
+            newRow.innerHTML = `
+                <td>
+                    <div class="form-check">
+                        <input class="form-check-input select-business" type="checkbox" name="selected_businesses" value="${customCompId}" id="select-${customCompId}" checked>
+                        <label class="form-check-label" for="select-${customCompId}"></label>
+                    </div>
+                </td>
+                <td>
+                    <strong>${name}</strong>
+                    <div class="small text-muted">${address}</div>
+                </td>
+                <td>${category}</td>
+                <td>Unknown</td>
+                <td>Custom added competitor</td>
+                <td></td>
+            `;
+            
+            // Add to tbody
+            tbody.appendChild(newRow);
+            
+            // Increment the counter
+            customCompetitorCount++;
+            
+            // Clear the form
+            document.getElementById('new-competitor-name').value = '';
+            document.getElementById('new-competitor-address').value = '';
+            
+            // Show success message
+            alert('Competitor added! It will be included in your pricing research.');
+        });
+    }
+    
+    // Override form validation to allow submission regardless of form field state
+    if (competitorsForm) {
+        competitorsForm.addEventListener('submit', function(event) {
+            // Clear the form fields to prevent validation errors
+            document.getElementById('new-competitor-name').value = '';
+            document.getElementById('new-competitor-address').value = '';
+            
+            // Allow the form to submit
+            return true;
+        });
+    }
+});
+</script>
+{% endblock %}

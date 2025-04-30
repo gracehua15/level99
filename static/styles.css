@@ -1,0 +1,316 @@
+/* static/styles.css */
+:root {
+    --primary-color: #2563eb;
+    --primary-hover: #1d4ed8;
+    --secondary-color: #6b7280;
+    --success-color: #059669;
+    --danger-color: #dc2626;
+    --light-color: #f3f4f6;
+    --dark-color: #1f2937;
+    --border-color: #e5e7eb;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  }
+  
+  body {
+    background-color: #f9fafb;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    font-family: var(--font-family);
+    color: #374151;
+  }
+  
+  .navbar {
+    box-shadow: var(--shadow-sm);
+    background-color: #fff;
+  }
+  
+  .navbar-brand {
+    font-weight: 600;
+    font-size: 1.25rem;
+    color: var(--primary-color);
+  }
+  
+  .navbar-dark .navbar-brand {
+    color: #fff;
+  }
+  
+  .footer {
+    margin-top: auto;
+    padding: 1rem 0;
+    font-size: 0.875rem;
+    color: var(--secondary-color);
+    border-top: 1px solid var(--border-color);
+    background-color: #fff;
+  }
+  
+  .card {
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: var(--shadow-md);
+    margin-bottom: 2rem;
+    background-color: #fff;
+  }
+  
+  .card-header {
+    font-weight: 600;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    background-color: #fff;
+    border-top-left-radius: 0.5rem !important;
+    border-top-right-radius: 0.5rem !important;
+  }
+  
+  .card-header.bg-primary {
+    background-color: var(--primary-color) !important;
+    color: #fff;
+  }
+  
+  .card-header.bg-success {
+    background-color: var(--success-color) !important;
+    color: #fff;
+  }
+  
+  .card-body {
+    padding: 1.5rem;
+  }
+  
+  .btn {
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    transition: all 0.2s ease;
+  }
+  
+  .btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+  }
+  
+  .btn-primary:hover, .btn-primary:focus {
+    background-color: var(--primary-hover);
+    border-color: var(--primary-hover);
+  }
+  
+  .btn-outline-primary {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+  }
+  
+  .btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    color: #fff;
+  }
+  
+  .btn-outline-light {
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+  
+  .btn-outline-light:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: #fff;
+  }
+  
+  /* Form controls */
+  .form-control, .form-select {
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    border: 1px solid var(--border-color);
+    font-size: 0.875rem;
+  }
+  
+  .form-control:focus, .form-select:focus {
+    border-color: #93c5fd;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  }
+  
+  .form-label {
+    font-weight: 500;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Table styling */
+  .table {
+    font-size: 0.875rem;
+    margin-bottom: 0;
+  }
+  
+  .table th {
+    font-weight: 600;
+    background-color: #f9fafb;
+    padding: 0.75rem 1rem;
+  }
+  
+  .table td {
+    padding: 0.75rem 1rem;
+    vertical-align: middle;
+  }
+  
+  .table-hover tbody tr:hover {
+    background-color: #f9fafb;
+  }
+  
+  .table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f9fafb;
+  }
+  
+  /* Competitor/Category Styling */
+  .competitor-categories {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem;
+    background-color: #fff;
+  }
+  
+  .category-filters .btn-group {
+    margin-bottom: 1rem;
+  }
+  
+  .category-filter {
+    margin: 0.25rem;
+    font-size: 0.875rem;
+  }
+  
+  /* Checkbox styles */
+  .form-check-input {
+    cursor: pointer;
+    width: 1rem;
+    height: 1rem;
+  }
+  
+  .form-check-label {
+    cursor: pointer;
+    font-size: 0.875rem;
+  }
+  
+  /* Accordion customization */
+  .accordion-button:not(.collapsed) {
+    background-color: #f0f9ff;
+    color: var(--primary-color);
+    font-weight: 600;
+    box-shadow: none;
+  }
+  
+  .accordion-button:focus {
+    box-shadow: none;
+    border-color: rgba(0,0,0,.125);
+  }
+  
+  .accordion-item {
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem;
+    margin-bottom: 0.5rem;
+    overflow: hidden;
+  }
+  
+  /* Loading spinner */
+  .spinner-border {
+    display: inline-block;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-width: 0.2em;
+  }
+  
+  /* Badges */
+  .badge {
+    font-weight: 500;
+    padding: 0.35em 0.65em;
+    font-size: 0.75em;
+  }
+  
+  /* Alert customization */
+  .alert {
+    border: none;
+    border-radius: 0.375rem;
+    padding: 1rem;
+  }
+  
+  /* Custom Styling for New Features */
+  .category-item {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    background-color: #f3f4f6;
+    border-radius: 0.375rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .category-item span {
+    flex-grow: 1;
+  }
+  
+  .category-item .btn-close {
+    font-size: 0.75rem;
+  }
+  
+  .add-category-form {
+    display: flex;
+    margin-bottom: 1rem;
+  }
+  
+  .add-category-form .form-control {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    flex-grow: 1;
+  }
+  
+  .add-category-form .btn {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+  
+  .add-competitor-form {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: #f9fafb;
+    border-radius: 0.375rem;
+    border: 1px dashed var(--border-color);
+  }
+  
+  .comparison-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  /* Tab styling */
+  .nav-tabs .nav-link {
+    color: var(--secondary-color);
+    font-weight: 500;
+    border: none;
+    padding: 0.75rem 1rem;
+  }
+  
+  .nav-tabs .nav-link.active {
+    color: var(--primary-color);
+    background-color: transparent;
+    border-bottom: 2px solid var(--primary-color);
+  }
+  
+  .nav-tabs .nav-link:hover {
+    border-color: transparent;
+  }
+  
+  /* Responsive table */
+  @media (max-width: 768px) {
+    .table-responsive {
+      border: none;
+    }
+  }
+  
+  /* Animation */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  .fade-in {
+    animation: fadeIn 0.3s ease-in;
+  }

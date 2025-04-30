@@ -1,0 +1,172 @@
+<!-- Complete index.html with the corrected form field -->
+{% extends 'base.html' %}
+
+{% block title %}Level99 Competitor Benchmarking{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h2 class="mb-0">Competitor Benchmarking Research</h2>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('search') }}" method="post" id="benchmarkForm">
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h4>Location Information</h4>
+                            <hr>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="city_state" class="form-label">City & State</label>
+                                <input type="text" class="form-control" id="city_state" name="city_state" 
+                                       placeholder="e.g. Boston, MA" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="zip_code" class="form-label">Zip Code</label>
+                                <input type="text" class="form-control" id="zip_code" name="zip_code" 
+                                       placeholder="e.g. 02108" required>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="mb-3">
+                                <label for="search_radius" class="form-label">Search Radius (miles)</label>
+                                <input type="number" class="form-control" id="search_radius" name="search_radius" 
+                                       placeholder="e.g. 10" min="1" max="100" value="10" required>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="mb-3">
+                                <label for="results_per_category" class="form-label">Results Per Category</label>
+                                <input type="number" class="form-control" id="results_per_category" name="results_per_category" 
+                                       placeholder="e.g. 5" min="1" value="5" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h4>Competitor Categories</h4>
+                            <p class="text-muted">Select the types of competitors to include in your research</p>
+                            <hr>
+                        </div>
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <!-- Category List -->
+                                <div id="selectedCategories">
+                                    {% for category in categories %}
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" name="categories" 
+                                               value="{{ category }}" id="category-{{ loop.index }}">
+                                        <label class="form-check-label" for="category-{{ loop.index }}">
+                                            {{ category }}
+                                        </label>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                
+                                <!-- Add Category Form -->
+                                <div class="mt-3">
+                                    <label class="form-label">Add Custom Category</label>
+                                    <div class="add-category-form">
+                                        <input type="text" class="form-control" id="newCategory" placeholder="e.g. Laser Tag">
+                                        <button type="button" class="btn btn-primary" id="addCategoryBtn">
+                                            <i class="bi bi-plus-lg"></i> Add
+                                        </button>
+                                    </div>
+                                    <!-- Hidden input to store custom categories -->
+                                    <input type="hidden" name="custom_categories" id="customCategoriesInput">
+                                </div>
+                                
+                                <!-- Custom Categories List -->
+                                <div id="customCategoriesList" class="mt-2"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-lg btn-primary">
+                            <span id="search-button-text">Search for Competitors</span>
+                            <span id="loading-spinner" class="d-none spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('benchmarkForm');
+    const addCategoryBtn = document.getElementById('addCategoryBtn');
+    const newCategoryInput = document.getElementById('newCategory');
+    const customCategoriesList = document.getElementById('customCategoriesList');
+    const customCategoriesInput = document.getElementById('customCategoriesInput');
+    
+    // Array to store custom categories
+    let customCategories = [];
+    
+    // Add category function
+    function addCategory() {
+        const categoryName = newCategoryInput.value.trim();
+        if (categoryName) {
+            customCategories.push(categoryName);
+            
+            // Create category item
+            const categoryItem = document.createElement('div');
+            categoryItem.className = 'category-item';
+            categoryItem.innerHTML = `
+                <span>${categoryName}</span>
+                <button type="button" class="btn-close" aria-label="Remove"></button>
+            `;
+            
+            // Add remove functionality
+            const removeBtn = categoryItem.querySelector('.btn-close');
+            removeBtn.addEventListener('click', function() {
+                customCategories = customCategories.filter(c => c !== categoryName);
+                customCategoriesList.removeChild(categoryItem);
+                updateCustomCategoriesInput();
+            });
+            
+            // Add to DOM
+            customCategoriesList.appendChild(categoryItem);
+            
+            // Update hidden input
+            updateCustomCategoriesInput();
+            
+            // Clear input
+            newCategoryInput.value = '';
+            newCategoryInput.focus();
+        }
+    }
+    
+    // Update hidden input
+    function updateCustomCategoriesInput() {
+        customCategoriesInput.value = customCategories.join(',');
+    }
+    
+    // Add category on button click
+    addCategoryBtn.addEventListener('click', addCategory);
+    
+    // Add category on Enter key press
+    newCategoryInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addCategory();
+        }
+    });
+    
+    // Form submit handling
+    form.addEventListener('submit', function() {
+        document.getElementById('search-button-text').textContent = 'Researching Competitors...';
+        document.getElementById('loading-spinner').classList.remove('d-none');
+    });
+});
+</script>
+{% endblock %}

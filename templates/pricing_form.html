@@ -1,0 +1,88 @@
+<!-- templates/pricing_form.html -->
+{% extends 'base.html' %}
+
+{% block title %}Select Businesses for Pricing Research | Level99{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">Select Businesses for Pricing Research</h2>
+                <a href="{{ url_for('results') }}" class="btn btn-outline-light">
+                    <i class="bi bi-arrow-left"></i> Back to Results
+                </a>
+            </div>
+            <div class="card-body">
+                <p class="lead mb-4">Please select the businesses you want to research for detailed pricing information:</p>
+                
+                <form action="{{ url_for('get_pricing') }}" method="post" id="pricingForm">
+                    <div class="table-responsive mb-4">
+                        <table class="table table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Business Name</th>
+                                    <th>Category</th>
+                                    <th>Distance</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for business in businesses %}
+                                <tr>
+                                    <td>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" 
+                                                   name="selected_businesses" 
+                                                   id="business-{{ loop.index }}" 
+                                                   value="{{ loop.index0 }}" 
+                                                   checked>
+                                            <label class="form-check-label" for="business-{{ loop.index }}">
+                                                <strong>{{ business.name }}</strong>
+                                            </label>
+                                        </div>
+                                    </td>
+                                    <td>{{ business.category }}</td>
+                                    <td>{{ business.distance }}</td>
+                                    <td>{{ business.description }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="alert alert-info" role="alert">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-info-circle-fill me-3 fs-4"></i>
+                            <div>
+                                The pricing research will analyze each selected business for pricing details across different times and days. This may take a minute to complete.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-lg btn-primary">
+                            <i class="bi bi-cash-coin me-2"></i>
+                            <span id="search-button-text">Get Pricing Information</span>
+                            <span id="loading-spinner" class="d-none spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('pricingForm');
+    
+    form.addEventListener('submit', function() {
+        document.getElementById('search-button-text').textContent = 'Researching Pricing...';
+        document.getElementById('loading-spinner').classList.remove('d-none');
+    });
+});
+</script>
+{% endblock %}
