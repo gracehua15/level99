@@ -6,7 +6,7 @@ import json
 import re
 
 app = Flask(__name__)
-app.secret_key = os.urandom(24)  # Needed for session management
+app.secret_key = os.environ.get('SECRET_KEY', 'dev_secret_key')  # Needed for session management
 
 # Initialize the Anthropic client
 client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
